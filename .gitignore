@@ -20,11 +20,11 @@ node_modules/
 # Fichiers de log
 *.log
 
+create-structure.sh
+
 # Fichiers de build Gradle
 .gradle/
 build/
 out/
 
 commit-fichier.sh
-
-create-structure.sh
