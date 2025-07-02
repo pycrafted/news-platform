@@ -5,9 +5,9 @@ services:
     image: postgres:15-alpine
     container_name: news-platform-db
     environment:
-      POSTGRES_DB: newsplatform
-      POSTGRES_USER: newsuser
-      POSTGRES_PASSWORD: G7!pR2@vLq8z
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -23,12 +23,12 @@ services:
     container_name: news-platform-backend
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - DB_HOST=db-prod-server-9f8a7c
-      - DB_PORT=5432
-      - DB_NAME=newsplatform_prod_2024
-      - DB_USERNAME=admin_9F8a7C
-      - DB_PASSWORD=G7!pR2@vLq8z
-      - JWT_SECRET=Qw3rT6yU9oP2sV5bX8cZ1aL4dE7gH0jK
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     ports:
       - "8080:8080"
     depends_on:
@@ -46,7 +46,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:8080/api
+      - VITE_API_URL=${API_URL}
     depends_on:
       - backend
     networks:
