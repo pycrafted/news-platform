@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: news-platform-db
+    environment:
+      POSTGRES_DB: newsplatform
+      POSTGRES_USER: newsuser
+      POSTGRES_PASSWORD: G7!pR2@vLq8z
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - news-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: news-platform-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=db-prod-server-9f8a7c
+      - DB_PORT=5432
+      - DB_NAME=newsplatform_prod_2024
+      - DB_USERNAME=admin_9F8a7C
+      - DB_PASSWORD=G7!pR2@vLq8z
+      - JWT_SECRET=Qw3rT6yU9oP2sV5bX8cZ1aL4dE7gH0jK
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - news-network
+    volumes:
+      - ./uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: news-platform-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+    depends_on:
+      - backend
+    networks:
+      - news-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+
+networks:
+  news-network:
+    driver: bridge
