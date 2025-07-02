@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: news-platform
+  profiles:
+    active: dev
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/newsplatform
+    username: ${DB_USERNAME:admin_9F8a7C}
+    password: ${DB_PASSWORD:G7!pR2@vLq8z}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=1h
+
+jwt:
+  secret: ${JWT_SECRET:Qw3rT6yU9oP2sV5bX8cZ1aL4dE7gH0jK}
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+
+logging:
+  level:
+    com.newsplatform: DEBUG
+    org.springframework.security: DEBUG 
