@@ -1,15 +1,22 @@
 FROM node:18-alpine
 
+RUN corepack enable && \
+    addgroup -S app && adduser -S app -G app
+
 WORKDIR /app
 
-COPY package*.json ./
-COPY pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
-RUN npm install -g pnpm
-RUN pnpm install
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
-EXPOSE 3000
+USER app
 
-CMD ["pnpm", "dev", "--host"] 
+ENV HOST=0.0.0.0 \
+    PORT=5173 \
+    CHOKIDAR_USEPOLLING=true
+
+EXPOSE 5173
+
+CMD ["pnpm", "dev", "--host", "0.0.0.0", "--port", "5173"]
