@@ -5,7 +5,7 @@ spring:
     active: dev
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/newsplatform
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:newsplatform}
     username: ${DB_USERNAME:admin_9F8a7C}
     password: ${DB_PASSWORD:G7!pR2@vLq8z}
     driver-class-name: org.postgresql.Driver
