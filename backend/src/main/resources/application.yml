@@ -5,9 +5,10 @@ spring:
     active: dev
   
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:newsplatform}
-    username: ${DB_USERNAME:admin_9F8a7C}
-    password: ${DB_PASSWORD:G7!pR2@vLq8z}
+    # Autorise soit SPRING_DATASOURCE_URL (fourni par Render) soit la construction manuelle via DB_*.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:newsplatform}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:admin_9F8a7C}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:G7!pR2@vLq8z}}
     driver-class-name: org.postgresql.Driver
   
   jpa:
@@ -22,6 +23,10 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    # Hérite par défaut de datasource mais permet la surcharge via SPRING_FLYWAY_* si nécessaire.
+    url: ${SPRING_FLYWAY_URL:${spring.datasource.url}}
+    user: ${SPRING_FLYWAY_USER:${spring.datasource.username}}
+    password: ${SPRING_FLYWAY_PASSWORD:${spring.datasource.password}}
   
   cache:
     type: caffeine
