@@ -17,16 +17,16 @@
     RUN gradle bootJar --no-daemon
     
     # --- ÉTAPE 2: RUN ---
-    FROM openjdk:17-jre-slim
+    FROM eclipse-temurin:17-jre-alpine
     
     # Installation des dépendances nécessaires
-    RUN apt-get update && apt-get install -y --no-install-recommends \
+    RUN apk add --no-cache \
         ca-certificates \
-        && rm -rf /var/lib/apt/lists/*
+        && rm -rf /var/cache/apk/*
     
     # Création d'un utilisateur non-root
-    RUN addgroup --system --gid 1001 appgroup && \
-        adduser --system --uid 1001 --gid 1001 --no-create-home appuser
+    RUN addgroup -g 1001 -S appgroup && \
+        adduser -u 1001 -S appuser -G appgroup
     
     WORKDIR /app
     
