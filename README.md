@@ -35,7 +35,7 @@ Technos principales : **Spring Boot 3**, **React + Vite**, **PostgreSQL 14+**, *
 ```bash
 git clone https://github.com/noreyni03/news-platform.git
 cd news-platform
-cp .env.example .env   # adapter si besoin
+cp .env.example .env 
 ```
 
 ### 2.2. Base de données locale
