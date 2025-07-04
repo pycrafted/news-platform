@@ -1,4 +1,4 @@
-# News Platform
+# News Platform (Readme Provisoire)
 
 Plateforme complète de gestion, publication et consultation d’actualités.
 Technos principales : **Spring Boot 3**, **React + Vite**, **PostgreSQL 14+**, **Flyway**, **JWT**.
