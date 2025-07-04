@@ -1,150 +1,140 @@
 # News Platform
 
-Plateforme complète de gestion, publication et consultation d'actualités, pensée pour la modularité, la sécurité et la performance.  
-**Repo GitHub : [noreyni03/news-platform](https://github.com/noreyni03/news-platform.git)**
-
-## Sommaire
-
-- [Présentation](#présentation)
-- [Fonctionnalités](#fonctionnalités)
-- [Architecture & Structure du projet](#architecture--structure-du-projet)
-- [Technologies utilisées](#technologies-utilisées)
-- [Installation & Démarrage](#installation--démarrage)
-- [Scripts utiles](#scripts-utiles)
-- [Déploiement](#déploiement)
-- [Contribuer](#contribuer)
-- [Licence](#licence)
+Plateforme complète de gestion, publication et consultation d’actualités.
+Technos principales : **Spring Boot 3**, **React + Vite**, **PostgreSQL 14+**, **Flyway**, **JWT**.
 
 ---
 
-## Présentation
+## Sommaire rapide
 
-**News Platform** est une application web moderne permettant la gestion collaborative d'articles d'actualité, avec une interface web, une API REST/Soap, et un client desktop.  
-Elle s'appuie sur une architecture microservices (backend, frontend, base de données, client desktop) orchestrée via Docker.
-
----
-
-## Fonctionnalités
-
-- Authentification et gestion des utilisateurs (rôles : admin, user)
-- Gestion des articles (création, édition, publication, brouillons)
-- Catégorisation des articles
-- API REST et SOAP pour l'intégration externe
-- Interface web moderne (React + Vite + TailwindCSS)
-- Client desktop JavaFX
-- Historique et audit des actions
-- Système de tokens JWT pour la sécurité
-- Scripts d'initialisation et de seed de la base de données
-- Prise en charge du développement local via Docker Compose
+1. Pré-requis
+2. Mise en route (backend, base, frontend)
+3. Variables d’environnement (`.env`)
+4. Pièges fréquents & solutions
+5. Scripts utiles
 
 ---
 
-## Architecture & Structure du projet
+## 1. Pré-requis
 
-```
-news-platform/
-│
-├── backend/         # API Spring Boot (REST & SOAP)
-│   └── src/main/java/com/newsplatform/
-│
-├── frontend/        # Application web React (Vite, TypeScript, TailwindCSS)
-│   └── src/
-│
-├── desktop-client/  # Client desktop JavaFX
-│   └── newsplatformdesktopclient/
-│
-├── database/        # Scripts d'init, seeds, backup pour PostgreSQL
-│
-├── integration/     # Tests d'intégration (Cypress)
-│
-├── scripts/         # Scripts d'automatisation (build, setup, etc.)
-│
-├── docker-compose.yml
-└── README.md
+| Outil          | Version mini | Pourquoi                             |
+|----------------|--------------|--------------------------------------|
+| Java JDK       | 17           | Spring Boot 3                        |
+| PostgreSQL     | 14 +         | Fonctions `uuid` / `pg_trgm`         |
+| Node + pnpm    | Node 18 +    | Frontend React                       |
+| Flyway         | — (bundlé)  | Migrations auto au démarrage         |
+
+> Debian / Ubuntu : `sudo apt install openjdk-17-jdk postgresql postgresql-contrib nodejs npm && npm i -g pnpm`
+
+---
+
+## 2. Mise en route
+
+### 2.1. Cloner et préparer l’environnement
+
+```bash
+git clone https://github.com/noreyni03/news-platform.git
+cd news-platform
+cp .env.example .env   # adapter si besoin
 ```
 
----
+### 2.2. Base de données locale
 
-## Technologies utilisées
+1. Démarrer PostgreSQL : `sudo systemctl start postgresql`
+2. Créer l’utilisateur et la base :
 
-- **Backend** : Java 17, Spring Boot 3, Spring Security, JPA/Hibernate, Flyway, PostgreSQL, Lombok
-- **Frontend** : React 19, Vite, TypeScript, TailwindCSS, Redux Toolkit, Axios, Yup, Heroicons
-- **Client Desktop** : JavaFX 17, ControlsFX, FormsFX, TilesFX, BootstrapFX
-- **Base de données** : PostgreSQL 15, extensions uuid-ossp & pg_trgm
-- **Tests** : JUnit 5, Cypress
-- **Outils & DevOps** : Docker, Docker Compose, Gradle, pnpm
+```sql
+CREATE ROLE newsuser WITH LOGIN PASSWORD 'G7!pR2@vLq8z';
+CREATE DATABASE newsplatform OWNER newsuser;
+```
 
----
+3. Activer les extensions requises :
 
-## Installation & Démarrage
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+```
 
-### Prérequis
+### 2.3. Lancer le backend
 
-- [Docker](https://www.docker.com/)
-- [pnpm](https://pnpm.io/) (pour le frontend)
-- [Java 17+](https://adoptium.net/) (pour le backend et le client desktop)
+```bash
+cd backend
+./gradlew bootRun   # ➜ http://localhost:8080
+```
 
-### Démarrage rapide (en local)
+### 2.4. Lancer le frontend
 
-1. **Cloner le dépôt :**
-   ```bash
-   git clone https://github.com/noreyni03/news-platform.git
-   cd news-platform
-   ```
-
-2. **Configurer les variables d'environnement :**
-   - Copier `.env.example` en `.env` à la racine et adapter si besoin.
-
-3. **Lancer l'environnement de développement :**
-   ```bash
-   ./scripts/setup-dev.sh
-   ```
-   Cela va :
-   - Initialiser la base PostgreSQL (via Docker)
-   - Installer les dépendances frontend/backend
-   - Builder le backend et le client desktop
-   - Démarrer tous les services (API, frontend, DB)
-
-4. **Accéder aux services :**
-   - Frontend : [http://localhost:3000](http://localhost:3000)
-   - Backend : [http://localhost:8080](http://localhost:8080)
-   - Documentation API : [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+```bash
+cd ../frontend
+pnpm install
+pnpm dev --host     # ➜ http://localhost:5173
+```
 
 ---
 
-## Scripts utiles
+## 3. Fichier `.env`
 
-- `./scripts/setup-dev.sh` : setup complet pour le dev local
-- `./scripts/build-all.sh` : build de tous les modules
-- `docker-compose up -d` : démarrage manuel des services
-- `docker-compose down` : arrêt des services
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=newsplatform
+DB_USERNAME=newsuser
+DB_PASSWORD=G7!pR2@vLq8z
 
----
+# JWT
+JWT_SECRET=change-me
+JWT_EXPIRATION=86400000
 
-## Déploiement
+# API
+API_URL=http://localhost:8080/api
+FRONTEND_URL=http://localhost:3000
 
-Le projet est prêt pour un déploiement sur tout environnement supportant Docker.  
-Adapter les variables d'environnement selon la cible (voir `docker-compose.yml` et les fichiers `.env`).
+# File Upload
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=10MB
 
----
-
-## Contribuer
-
-1. Forkez le repo, créez une branche, proposez une PR.
-2. Respectez la structure du projet et les conventions de code.
-3. Ajoutez des tests pour toute nouvelle fonctionnalité.
-
----
-
-## Licence
-
-Ce projet est sous licence MIT.
+# SOAP
+SOAP_ENDPOINT_URL=http://localhost:8080/ws
+```
 
 ---
 
-**Contact & Documentation :**  
-Voir la documentation technique dans le dossier [`/docs`](./docs) pour plus de détails sur l'API, l'architecture et le déploiement.
+## 4. Pièges fréquents & solutions
+
+| Problème                                      | Cause                                    | Correctif                                           |
+|-----------------------------------------------|------------------------------------------|------------------------------------------------------|
+| `UnknownHostException: db`                    | `DB_HOST` pointe vers `db` (docker)      | Mettre `localhost`                                   |
+| `password authentication failed`              | Utilisateur / mot de passe non alignés   | `ALTER ROLE newsuser WITH PASSWORD '...'`            |
+| `function uuid_generate_v4() does not exist`  | Extension `uuid-ossp` manquante          | `CREATE EXTENSION "uuid-ossp";`                     |
+| Erreur SQL sur apostrophe                     | Apostrophe non échappée dans les INSERT  | Doubler `'` → `''`                                   |
+| Port 8080 déjà pris                           | Service déjà actif                       | Définir `SERVER_PORT=8081` ou arrêter le service     |
 
 ---
 
-*Généré automatiquement à partir de l'analyse du code source.*
+## 5. Scripts utiles
+
+```bash
+./scripts/build-all.sh   # build complet (backend + frontend)
+
+# Réinitialiser la DB et rejouer les migrations (⚠️ destructive)
+psql -U newsuser -d newsplatform -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
+```
+
+---
+
+## 🛠️ Contribuer
+
+1. Fork → branche → PR.
+2. Exécuter `./gradlew test` et `pnpm lint` avant de pousser.
+
+---
+
+## 📄 Licence
+
+MIT
+
+---
+
+**Contact / Support** : ouvrez une issue sur GitHub.
+
